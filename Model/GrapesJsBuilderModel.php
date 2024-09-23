@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
+use WyriHaximus\HtmlCompress\Factory;
 
 class GrapesJsBuilderModel extends AbstractCommonModel
 {
@@ -68,6 +69,11 @@ class GrapesJsBuilderModel extends AbstractCommonModel
             $this->getRepository()->saveEntity($grapesJsBuilder);
 
             $customHtml = $this->requestStack->getCurrentRequest()->get('emailform')['customHtml'] ?? null;
+            if ($customHtml !== null) {
+                $compressor = Factory::constructSmallest();
+                $customHtml = $compressor->compress($customHtml);
+            }
+            
             $email->setCustomHtml($customHtml);
             $this->emailModel->getRepository()->saveEntity($email);
         }
